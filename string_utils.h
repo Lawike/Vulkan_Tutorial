@@ -1,5 +1,5 @@
-#ifndef STRINGULTIS_H
-#define STRINGULTIS_H
+#ifndef STRINGUTILS_H
+#define STRINGUTILS_H
 
 bool isStringIncluded(const char** arrayOfStrings, const char* targetString);
 
