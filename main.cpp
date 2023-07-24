@@ -41,6 +41,7 @@ private:
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice device;
 
     void initWindow() {
         glfwInit();
@@ -71,6 +72,7 @@ private:
         createInstance();
         setupDebugMessenger();
         pickPhysicalDevice();
+        createLogicalDevice();
     }
 
 
@@ -212,6 +214,38 @@ private:
         return indices.isComplete();
     }
 
+    void createLogicalDevice() {
+        /*
+            Specifying the queues to be created
+        */
+        QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+        queueCreateInfo.queueCount = 1;
+        float queuePriority = 1.0f;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+
+        /*
+            Specifying the used device features
+        */
+        VkPhysicalDeviceFeatures deviceFeatures{};
+
+        /*
+            Logical Device creation
+        */
+        VkDeviceCreateInfo createInfo{}; // enabledLayerCount & ppEnabledLayerNames are deprecated
+        createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        createInfo.pQueueCreateInfos = &queueCreateInfo;
+        createInfo.queueCreateInfoCount = 1;
+        createInfo.pEnabledFeatures = &deviceFeatures;
+
+        if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create the logical device!");
+        }
+    }
+
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
@@ -222,7 +256,7 @@ private:
         if (enableValidationLayers) {
             DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
         }
-
+        vkDestroyDevice(device, nullptr);
         vkDestroyInstance(instance, nullptr);
 
         glfwDestroyWindow(window);

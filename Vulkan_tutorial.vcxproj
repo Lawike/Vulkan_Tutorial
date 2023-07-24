@@ -136,11 +136,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="debug_utils.cpp" />
+    <ClCompile Include="queue_family.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="string_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug_utils.h" />
+    <ClInclude Include="queue_family.h" />
     <ClInclude Include="string_utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
