@@ -12,6 +12,7 @@
 #include "string_utils.h"
 #include "debug_utils.h"
 #include "queue_family.h"
+#include "swap_chain.h"
 
 
 // ============================
@@ -24,6 +25,13 @@ class HelloTriangleApplication {
 
     const std::vector<const char*> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
+    };
+
+    /*
+        Required device extensions
+    */
+    const std::vector<const char*> deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
 #ifdef NDEBUG
@@ -43,11 +51,19 @@ private:
     GLFWwindow* window;
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
+
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device;
+
     VkQueue graphicsQueue; // Cleaned up with device
-    VkSurfaceKHR surface; // Abstract surface on which render will display
     VkQueue presentQueue;
+
+    VkSurfaceKHR surface; // Abstract surface on which render will display
+
+    VkSwapchainKHR swapChain;
+    std::vector<VkImage> swapChainImages;
+    VkFormat swapChainImageFormat;
+    VkExtent2D swapChainExtent;
 
     void initWindow() {
         glfwInit();
@@ -80,6 +96,7 @@ private:
         createSurface();
         pickPhysicalDevice();
         createLogicalDevice();
+        createSwapChain();
     }
 
 
@@ -216,9 +233,30 @@ private:
     }
 
     bool isDeviceSuitable(VkPhysicalDevice device) {
+
         QueueFamilyIndices indices = findQueueFamilies(device, surface);
 
-        return indices.isComplete();
+        bool extensionsSupported = checkDeviceExtensionSupport(device);
+        bool swapChainAdequate = false;
+        if (extensionsSupported) {
+            SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, surface);
+            swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+        }
+        return indices.isComplete() && extensionsSupported && swapChainAdequate;
+    }
+
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
+        uint32_t extensionCount;
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+        std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+        std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+        for (const auto& extension : availableExtensions) {
+            requiredExtensions.erase(extension.extensionName);
+        }
+
+        return requiredExtensions.empty();
     }
 
     void createLogicalDevice() {
@@ -255,7 +293,16 @@ private:
         createInfo.pQueueCreateInfos = queueCreateInfos.data();
         createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
         createInfo.pEnabledFeatures = &deviceFeatures;
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+        createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
+        if (enableValidationLayers) {
+            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+            createInfo.ppEnabledLayerNames = validationLayers.data();
+        }
+        else {
+            createInfo.enabledLayerCount = 0;
+        }
         if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) {
             throw std::runtime_error("failed to create the logical device!");
         }
@@ -270,6 +317,80 @@ private:
         }
     }
 
+    void createSwapChain() {
+        /*
+            Setup swap chain
+        */
+        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice, surface);
+        VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
+        VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
+        VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilties, window);
+        uint32_t imageCount = swapChainSupport.capabilties.minImageCount + 1; // Atleast one more image allows us to avoid waiting for the driver to complete internal operations
+        if (swapChainSupport.capabilties.maxImageCount > 0 && imageCount > swapChainSupport.capabilties.maxImageCount) {
+            imageCount = swapChainSupport.capabilties.maxImageCount;
+        }
+        /*
+            Create swap chain
+        */
+        VkSwapchainCreateInfoKHR createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        createInfo.surface = surface;
+        createInfo.minImageCount = imageCount;
+        createInfo.imageFormat = surfaceFormat.format;
+        createInfo.imageColorSpace = surfaceFormat.colorSpace;
+        createInfo.imageExtent = extent;
+        createInfo.imageArrayLayers = 1; // Nb of layer of each image (multiple for stereoscopic 3D application)
+        /*
+            This parameter is to describe
+            what kind of operatios we will perform on our images
+            in this case they're used as color attachment.
+        */
+        createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; 
+        QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
+        uint32_t queueFamilyIndices[] = { 
+            indices.graphicsFamily.value(),
+            indices.presentFamily.value()
+        };
+        /*
+            Eclusive mode means that we have to
+            explictly transfer ownership of image
+            between the queues (graphics & present).
+            It's easy to manage when both queues are the same.
+            We'll use the Concurrent here to avoid that management
+            even if it impacts performances.
+            If the graphics queue family and presentation queue family are the same,
+            which will be the case on most hardware,
+            then we should stick to exclusive mode,
+            because concurrent mode requires to specify 
+            at least two distinct queue families
+        */
+        if (indices.graphicsFamily != indices.presentFamily) {
+            createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+            createInfo.queueFamilyIndexCount = 2;
+            createInfo.pQueueFamilyIndices = queueFamilyIndices;
+        } else {
+            createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            createInfo.queueFamilyIndexCount = 0;
+            createInfo.pQueueFamilyIndices = nullptr;
+        }
+        createInfo.preTransform = swapChainSupport.capabilties.currentTransform;
+        createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        createInfo.presentMode = presentMode;
+        createInfo.clipped = VK_TRUE;
+        createInfo.oldSwapchain = VK_NULL_HANDLE; // To handle a recreation of the swap chain (on resize for example)
+
+        if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create swap chain!");
+        }
+
+        vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
+        swapChainImages.resize(imageCount);
+        vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data());
+
+        swapChainImageFormat = surfaceFormat.format;
+        swapChainExtent = extent;
+    }
+
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
@@ -280,6 +401,7 @@ private:
         if (enableValidationLayers) {
             DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
         }
+        vkDestroySwapchainKHR(device, swapChain, nullptr);
         vkDestroyDevice(device, nullptr);
         vkDestroySurfaceKHR(instance, surface, nullptr);
         vkDestroyInstance(instance, nullptr);

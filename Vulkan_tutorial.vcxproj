@@ -139,11 +139,13 @@
     <ClCompile Include="queue_family.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="string_utils.cpp" />
+    <ClCompile Include="swap_chain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug_utils.h" />
     <ClInclude Include="queue_family.h" />
     <ClInclude Include="string_utils.h" />
+    <ClInclude Include="swap_chain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
