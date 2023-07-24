@@ -86,7 +86,6 @@ private:
         if (enableValidationLayers) {
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
-
         return extensions;
     }
 
@@ -119,7 +118,6 @@ private:
         if (enableValidationLayers && !checkValidationLayerSupport()) {
             throw std::runtime_error("validation layers requested, but not available !");
         }
-
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "Hello Triangle";
@@ -127,7 +125,6 @@ private:
         appInfo.pEngineName = "No Engine";
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.apiVersion = VK_API_VERSION_1_0;
-
         /*
             Get all supported vulkan extensions
         */
@@ -139,11 +136,9 @@ private:
         for (const auto& extension : extensions) {
             std::cout << '\t' << extension.extensionName << '\n';
         }
-
         /*
             Enable all required vulkan extensions
         */
-
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo = &appInfo;
@@ -151,7 +146,6 @@ private:
         createInfo.enabledExtensionCount = static_cast<uint32_t> (requiredExtensions.size());
         createInfo.ppEnabledExtensionNames = requiredExtensions.data();
         createInfo.enabledLayerCount = 0;
-
         /*
             Enable validationLayers
         */
@@ -233,7 +227,6 @@ private:
     }
 
     bool isDeviceSuitable(VkPhysicalDevice device) {
-
         QueueFamilyIndices indices = findQueueFamilies(device, surface);
 
         bool extensionsSupported = checkDeviceExtensionSupport(device);
@@ -279,12 +272,10 @@ private:
             queueCreateInfo.pQueuePriorities = &queuePriority;
             queueCreateInfos.push_back(queueCreateInfo);
         }
-
         /*
             Specifying the used device features
         */
         VkPhysicalDeviceFeatures deviceFeatures{};
-
         /*
             Logical Device creation
         */
