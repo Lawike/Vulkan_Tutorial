@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Fichiers de ressources\Shaders">
+      <UniqueIdentifier>{5a4e4f96-3a18-4ccd-b9c7-c9176756fc55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -30,6 +33,9 @@
     <ClCompile Include="swap_chain.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="fileSystem.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="string_utils.h">
@@ -44,5 +50,19 @@
     <ClInclude Include="swap_chain.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="fileSystem.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shader.vert">
+      <Filter>Fichiers de ressources\Shaders</Filter>
+    </Text>
+    <Text Include="shader.frag">
+      <Filter>Fichiers de ressources\Shaders</Filter>
+    </Text>
+    <Text Include="compile.bat">
+      <Filter>Fichiers de ressources\Shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>
