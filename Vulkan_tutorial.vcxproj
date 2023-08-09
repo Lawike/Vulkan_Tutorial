@@ -139,6 +139,7 @@
     <ClCompile Include="queue_family.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="fileSystem.cpp" />
+    <ClCompile Include="vertex.cpp" />
     <ClCompile Include="string_utils.cpp" />
     <ClCompile Include="swap_chain.cpp" />
   </ItemGroup>
@@ -148,6 +149,7 @@
     <ClInclude Include="queue_family.h" />
     <ClInclude Include="string_utils.h" />
     <ClInclude Include="swap_chain.h" />
+    <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shader.vert">
