@@ -21,42 +21,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="string_utils.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="debug_utils.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="queue_family.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="swap_chain.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="fileSystem.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="vertex.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="string_utils.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="debug_utils.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="queue_family.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="swap_chain.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="fileSystem.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex.h">
+    <ClInclude Include="fileSystem.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
