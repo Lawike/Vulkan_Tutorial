@@ -16,6 +16,9 @@
     <Filter Include="Fichiers de ressources\Shaders">
       <UniqueIdentifier>{5a4e4f96-3a18-4ccd-b9c7-c9176756fc55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers de ressources\Textures">
+      <UniqueIdentifier>{fe95df84-01d8-497c-9fa7-ccdb8f1ce635}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -40,5 +43,10 @@
     <Text Include="compile.bat">
       <Filter>Fichiers de ressources\Shaders</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Textures\Nanami_happy_3.png">
+      <Filter>Fichiers de ressources\Textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>
