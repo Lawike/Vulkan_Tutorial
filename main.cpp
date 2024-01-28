@@ -305,7 +305,6 @@ private:
         vkDeviceWaitIdle(device);
 
         cleanupSwapChain();
-
         createSwapChain();
         createImageViews();
         createFramebuffers();
@@ -834,7 +833,7 @@ private:
     }
 
     void createTextureImageView() {
-        createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+        textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
     }
 
     VkImageView createImageView(VkImage image, VkFormat format) {
